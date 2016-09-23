@@ -4,6 +4,12 @@ use POSIX;
 use Data::Dumper;
 use String::Util qw(trim);
 use Term::ANSIColor;
+use File::Basename;
+my $dirname = dirname(__FILE__);
+#print STDERR "\tdir name of current BIN: $dirname \n";
+
+## -- 载入所需的sub functions --
+require "$dirname/taxonomy_utils.pl";
 
 ## *********************************************
 ## ** version history **
@@ -37,62 +43,24 @@ my $dbuser      = defined $opts{dbuser} ? $opts{dbuser} : 'wchen';
 my $dbpass      = $opts{dbpass};
 my $host        = defined $opts{host} ? $opts{host} : 'localhost';
 
-print join("\t", qw(idx ncbi_taxon_id sci_name rank parent_taxon_id)),"\n";
-my @arr = &path_to_root( $opts{i}, $dbuser, $dbpass, $host );
+print join("\t", qw(idx ncbi_taxon_id sci_name rank parent_ncbi_taxon_id)),"\n";
+#print "---- use bioperl module ----\n";
+#my @arr = &path_to_root_bioperl( $opts{i});
+#foreach my $arrref (@arr){
+#    print join("\t", @{$arrref}), "\n";
+#}
+
+
+print "---- use local db ----\n";
+my @arr = &path_to_root( $opts{i}, $MyDB, $dbuser, $dbpass, $host );
 foreach my $arrref (@arr){
     print join("\t", @{$arrref}), "\n";
 }
 
 
-###############################################################
-##
-sub path_to_root {
-    my ( $query_ncbi_taxid, $dbuser, $dbpass, $host ) = @_;
-    my $dbh         = DBI->connect("dbi:mysql:$MyDB:$host",$dbuser, $dbpass ,{PrintError=>0,RaiseError=>1}) or die "Can't connect to mysql database: $DBI::errstr\n";
-    my @aResults = ();
+#print "---- use other bioperl modules 2 ----\n";
+#@arr = &path_to_root_bioperl_best( $opts{i} );
+#foreach my $arrref (@arr){
+#    print join("\t", @{$arrref}), "\n";
+#}
 
-    my $idx = 0;
-    ## -- get by ncbi taxid --
-    my $sth=$dbh->prepare( "SELECT taxon_name.name, taxon.node_rank, taxon.parent_taxon_id FROM taxon, taxon_name where taxon.taxon_id = taxon_name.taxon_id AND taxon_name.name_class='scientific name' AND taxon.ncbi_taxon_id=?;" );
-    my $query_internal_taxid = 0;
-    $sth->bind_param( 1, $query_ncbi_taxid ); ## taxon_id
-    $sth->execute();
-    while( my ($sciname, $rank, $parent_taxon_id) = $sth->fetchrow_array() ){ ## sciname, rank, taxid, parent_taxon_id
-        if( defined $parent_taxon_id ){
-            $idx ++;
-            push @aResults, [$idx, $query_ncbi_taxid, $sciname, $rank, $parent_taxon_id];
-
-            $query_internal_taxid = $parent_taxon_id; ##
-        }
-    }
-
-    ## -- get by internal taxid --
-    my $sth_internal=$dbh->prepare( "SELECT taxon_name.name, taxon.ncbi_taxon_id, taxon.node_rank, taxon.parent_taxon_id FROM taxon, taxon_name where taxon.taxon_id = taxon_name.taxon_id AND taxon_name.name_class='scientific name' AND taxon.taxon_id=?;" );
-    if( $query_internal_taxid > 0 ){
-        while(1){
-            $sth_internal->bind_param( 1, $query_internal_taxid ); ## taxon_id
-            $sth_internal->execute();
-
-            $idx ++;
-
-            my $retrieved_count = 0;
-            my $exit = 0;
-            while( my ($sciname,  $ncbi_taxon_id, $rank, $parent_taxon_id) = $sth_internal->fetchrow_array() ){ ## sciname, rank, taxid, parent_taxon_id
-                if( defined $parent_taxon_id ){
-                    $retrieved_count ++;
-                    push @aResults, [$idx, $ncbi_taxon_id, $sciname, $rank, $parent_taxon_id];
-
-                    $exit ++ if( $ncbi_taxon_id == 1 or $parent_taxon_id == $query_internal_taxid );
-                    $query_internal_taxid = $parent_taxon_id;
-                }
-            }
-
-            if( $retrieved_count <= 0 or $exit > 0 ){
-                last; ## exit the loop;
-            }
-        }
-    }
-
-
-    return @aResults;
-}

@@ -32,8 +32,8 @@ use Bio::Tree::Tree;
   my $tree_functions = Bio::Tree::Tree->new();
   my @lineage = $tree_functions->get_lineage_nodes($node);
   my $lineage = $tree_functions->get_lineage_string($node);
-  
+
   #print Dumper @lineage, "\n\n";
-  
+
 
 #print Dumper $node->classification;

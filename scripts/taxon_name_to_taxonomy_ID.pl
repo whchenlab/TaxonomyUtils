@@ -9,7 +9,7 @@ my $dirname = dirname(__FILE__);
 #print STDERR "\tdir name of current BIN: $dirname \n";
 
 ## -- 载入所需的sub functions --
-require "$dirname/../taxonomy_utils.pl";
+require "$dirname/taxonomy_utils.pl";
 
 use DBI;
 

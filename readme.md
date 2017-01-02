@@ -51,3 +51,45 @@ idx	ncbi_taxon_id   sci_name	rank	parent_taxon_id
 31	131567	cellular organisms	no rank	128
 32	1	root	no rank	128
 ```
+
+### taxon name to taxon ID converter
+input : a text file contains a list of NCBI taxon names, one per line; trailing ';' will be removed
+output : a list of valid taxon names and corresponding NCBI taxon IDs, one pair per line;
+
+**other parameters:**
+```
+perl scripts/taxon_name_to_taxID.pl
+--------------------------------------------------------------------------------------------------
+           version : 1.0 by Weihua Chen; last modified : Jan 02, 2017
+--------------------------------------------------------------------------------------------------
+   USAGE: perl scripts/taxon_name_to_taxID.pl
+       -i input file contains a list of taxon names, one per line, case sensitive
+       -o output ncbi taxoID result file
+       -log output log file
+
+     [optional]
+       -target target taxon name, can be multiple, separated by ',', for example
+           bacteria
+           archaea
+           bacteria,archaea
+        case-insensitive, default is none
+       -debug, debug mode, if true, will print additional information to screen
+
+       -db database, default biosql
+       -dbpass database password
+       -dbuser wchen
+       -host localhost
+
+     [note]
+       taxon names like 'Candidatus_Accumulibacter' will be reformated as 'Candidatus Accumulibacter'
+--------------------------------------------------------------------------------------------------
+```
+
+**parameters to run Ni's task:**
+```
+perl ~/development/GithubRepos/TaxonomyUtils/scripts/taxon_name_to_taxID.pl \
+    -i taxonomy\ on\ genus\ level.txt  \
+    -o taxonomy_on_genus_level_valided_chen.lst  \
+    -log taxonomy_on_genus_level_invalide.txt \
+    -target bacteria,archaea
+```

@@ -15,7 +15,8 @@ require "$dirname/taxonomy_utils.pl";
 ## ** version history **
 ## *********************************************
 my $ver = '1.0';
-my $last_modified = 'Jan 01, 2017';
+my $last_modified   = 'Jan 01, 2017';
+$last_modified      = 'Jan 02, 2017';
 
 ## *********************************************
 ## ** GET opts **
@@ -32,6 +33,7 @@ if (!$opts{i} or !$opts{o} or !$opts{log}){
         -i input file contains a list of taxon names, one per line, case sensitive
         -o output ncbi taxoID result file
         -log output log file
+
       [optional]
         -target target taxon name, can be multiple, separated by ',', for example
             bacteria
@@ -44,6 +46,9 @@ if (!$opts{i} or !$opts{o} or !$opts{log}){
         -dbpass database password
         -dbuser wchen
         -host localhost
+
+      [note]
+        taxon names like 'Candidatus_Accumulibacter' will be reformated as 'Candidatus Accumulibacter'
 --------------------------------------------------------------------------------------------------\n";
     exit;
 }
@@ -64,7 +69,7 @@ if( defined $opts{target} ){
     }
 }
 
-print Dumper %hTargetTaxons;
+#print Dumper %hTargetTaxons;
 
 ## -- user inpout parameters for input/output --
 my $infile     = $opts{i};
@@ -73,9 +78,9 @@ my $logfile    = $opts{log};
 
 ## ======================================================================
 if( defined $opts{target} ){
-    print STDERR "\t======================================================\n";
+    print STDERR "\t============================================================================\n";
     print STDERR "\t\tonly taxons belong to '", $opts{target}, "' will be retained.\n";
-    print STDERR "\t======================================================\n\n";
+    print STDERR "\t============================================================================\n\n";
 }
 
 
@@ -90,12 +95,17 @@ while(my $line = <IN>){
     if( $line =~ /;$/ ){
         chop $line;
     }
+
+    if( $line =~ /Candidatus_/ ){
+        $line =~ s/Candidatus_/Candidatus /;
+    }
+
     $hash{ $line } ++;
 }
 close IN;
 
 my @aTaxonNames = sort keys %hash;
-print Dumper @aTaxonNames if( defined $opts{debug}) if( defined $opts{debug});
+print Dumper @aTaxonNames if( defined $opts{debug});
 
 ## -- db handle --
 my $dbh = DBI->connect("dbi:mysql:$MyDB:$host",$dbuser, $dbpass ,{PrintError=>0,RaiseError=>1}) or die "Can't connect to mysql database: $DBI::errstr\n";
@@ -147,6 +157,6 @@ foreach my $taxonname ( @aTaxonNames ){
 close OUT;
 close LOG;
 
-print STDERR "\n=============    stats   ===============\n";
-print STDERR "\ttotal: ", scalar @aTaxonNames, ", valid: " , $valid_entries, "\n";
-print STDERR "\n========================================\n\n";
+print STDERR "\n\t=============    stats   ===============\n";
+print STDERR "\t\ttotal: ", scalar @aTaxonNames, ", valid: " , $valid_entries, "\n";
+print STDERR "\t========================================\n\n";

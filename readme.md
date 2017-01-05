@@ -54,6 +54,7 @@ idx	ncbi_taxon_id   sci_name	rank	parent_taxon_id
 
 ### taxon name to taxon ID converter
 input : a text file contains a list of NCBI taxon names, one per line; trailing ';' will be removed
+
 output : a list of valid taxon names and corresponding NCBI taxon IDs, one pair per line;
 
 **other parameters:**
@@ -85,11 +86,46 @@ perl scripts/taxon_name_to_taxID.pl
 --------------------------------------------------------------------------------------------------
 ```
 
-**parameters to run Ni's task:**
+**command to run Ni's task:**
 ```
 perl ~/development/GithubRepos/TaxonomyUtils/scripts/taxon_name_to_taxID.pl \
     -i taxonomy\ on\ genus\ level.txt  \
     -o taxonomy_on_genus_level_valided_chen.lst  \
     -log taxonomy_on_genus_level_invalide.txt \
     -target bacteria,archaea
+```
+
+### tree iterator
+This script takes a NCBI taxonomy tree as input, iterates its leaf nodes and groups the latter into subgroups according to the user-supplied taxonomy level, e.g. family, order, class, or phylum. For example, a user-supplied taxonomy level 'order' means that leaf nodes should be grouped into subgroups according to the 'order' that they belong.
+
+Based on these results, users can choose to either print the members of the subgroups, or make pairwise pairs within each subgroups.
+
+**parameters**
+
+```
+--------------------------------------------------------------------------------------------------
+    		version : 1.0 by Weihua Chen; last modified : Jan 5, 2017
+--------------------------------------------------------------------------------------------------
+    USAGE: perl /Users/wchen/development/GithubRepos/TaxonomyUtils/scripts/tree_iterator.pl
+        -i input tree file in newick format; only the first tree will be processed ...
+        -l taxonomy level by which leaf-nodes to be groupped, for example family
+        -t task to perform, for example:
+            list : list leaf species names and corresponding taxIDs
+            pairwise : list all possible pairs within each group
+        -o output file
+      [optional]
+        -dbuser database user name, default is wchen
+        -host database host, default is localhost
+        -dbpass database password, default is xxx
+        -d database, default is biosql
+--------------------------------------------------------------------------------------------------
+```
+
+**shell command to for Ni's task**
+```
+perl /Users/wchen/development/GithubRepos/TaxonomyUtils/scripts/tree_iterator.pl \
+    -i ../the_tree/Zcbk36n2u-F0h-k9klTbyg_newick_1400_species.txt \
+    -l order \
+    -t pairwise \
+    -o 1400_species_group_by_order_pairwise.txt
 ```

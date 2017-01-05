@@ -43,6 +43,8 @@ my $dbuser      = defined $opts{dbuser} ? $opts{dbuser} : 'wchen';
 my $dbpass      = $opts{dbpass};
 my $host        = defined $opts{host} ? $opts{host} : 'localhost';
 
+my $dbh = DBI->connect("dbi:mysql:$MyDB:$host",$dbuser, $dbpass ,{PrintError=>0,RaiseError=>1}) or die "Can't connect to mysql database: $DBI::errstr\n";
+
 print join("\t", qw(idx ncbi_taxon_id sci_name rank parent_ncbi_taxon_id)),"\n";
 #print "---- use bioperl module ----\n";
 #my @arr = &path_to_root_bioperl( $opts{i});
@@ -52,7 +54,7 @@ print join("\t", qw(idx ncbi_taxon_id sci_name rank parent_ncbi_taxon_id)),"\n";
 
 
 print "---- use local db ----\n";
-my @arr = &path_to_root( $opts{i}, $MyDB, $dbuser, $dbpass, $host );
+my @arr = &path_to_root( $opts{i}, $dbh );
 foreach my $arrref (@arr){
     print join("\t", @{$arrref}), "\n";
 }
@@ -63,4 +65,3 @@ foreach my $arrref (@arr){
 #foreach my $arrref (@arr){
 #    print join("\t", @{$arrref}), "\n";
 #}
-

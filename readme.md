@@ -1,6 +1,6 @@
 ## install NCBI taxonomy via BioSQL
 1. download from https://github.com/biosql/biosql
-2. run download taxonomy from NCBI and load it into database 'biosql' (make sure the database esists):
+2. run download taxonomy from NCBI and load it into database 'biosql' (_*make sure the database exists*_):
 ```
 perl scripts/load_ncbi_taxonomy.pl \
     --dbname biosql --driver mysql --dbuser dbuser \

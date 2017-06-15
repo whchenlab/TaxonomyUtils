@@ -8,6 +8,33 @@ perl scripts/load_ncbi_taxonomy.pl \
 ```
 
 ## scripts
+### make flat taxon table
+parameters
+```
+perl scripts/make_flat_taxon_table.pl -dbpass xxx -o output_mysql_table
+```
+this script assembles major rank information for an internal / leaf taxon and write it to output_mysql_table
+here is the table structure:
+```sql
+CREATE TABLE `taxon2majorranks` (
+  `taxon_id` int(10) NOT NULL,
+  `ncbi_taxon_id` int(10) NOT NULL,
+  `is_major_rank` BOOLEAN NOT NULL DEFAULT 0,
+  `closest_major_rank_taxon_id` int(10) NOT NULL,
+  `superkindom_taxon_id` int(10),
+  `kindom_taxon_id` int(10),
+  `phylum_taxon_id` int(10),
+  `class_taxon_id` int(10),
+  `order_taxon_id` int(10),
+  `family_taxon_id` int(10),
+  `genus_taxon_id` int(10),
+  `species_taxon_id` int(10),
+  PRIMARY KEY (`taxon_id`),
+  UNIQUE KEY `ncbi_taxon_id` (`ncbi_taxon_id`),
+  KEY `superkindom_taxon_id` (`superkindom_taxon_id`)
+);
+```
+
 ### path to root
 input: ncbi taxonomy ID, such as 9606 (for human) and 10090 (for mouse)
 output: parent nodes along the NCBI taxonomy tree all the way to the root.
@@ -102,7 +129,7 @@ Based on these results, users can choose to either print the members of the subg
 
 **parameters**
 
-```
+```shell
 --------------------------------------------------------------------------------------------------
     		version : 1.0 by Weihua Chen; last modified : Jan 5, 2017
 --------------------------------------------------------------------------------------------------

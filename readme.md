@@ -7,6 +7,18 @@ perl scripts/load_ncbi_taxonomy.pl \
     --download true --dbpass xxx --allow_truncate
 ```
 
+or download it via the following link, mv it to a taxdata folder, unzip it.
+```
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+mkdir -p taxdata
+mv taxdump.tar.gz taxdata/
+tar -zxvf taxdata/tardump.tar.gz
+
+perl scripts/load_ncbi_taxonomy.pl \
+    --dbname biosql --driver mysql --dbuser dbuser \
+    --dbpass xxx --allow_truncate
+```
+
 ## scripts
 ### make flat taxon table
 parameters

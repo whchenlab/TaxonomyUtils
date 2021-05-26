@@ -12,8 +12,14 @@ or download it via the following link, mv it to a taxdata folder, unzip it.
 wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 mkdir -p taxdata
 mv taxdump.tar.gz taxdata/
+cd taxdata
 tar -zxvf taxdata/tardump.tar.gz
 
+cd ..
+
+## create necessary tables in MySQL using https://github.com/biosql/biosql/blob/master/sql/biosqldb-mysql.sql
+
+## then load ... 
 perl scripts/load_ncbi_taxonomy.pl \
     --dbname biosql --driver mysql --dbuser dbuser \
     --dbpass xxx --allow_truncate
